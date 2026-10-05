@@ -1,45 +1,39 @@
 import json
 
-"""
-Note: This is designed to hold a list of contacts as a list of dictionaries.
-An alternative approach is to build a "Contact" class to represent a contact.
-If you would like to do that as a Bonus exercise, that would be good way
-to practice using OOP and composition!
-"""
-
-
 class ContactManager:
-    """Class to do CRUD operations on the list of contacts"""
 
     def __init__(self, file="data.json"):
         self.file = file
         self.contacts = []
 
     def load_contacts(self):
-        """Loads contacts from a JSON file and converts them to a list of
-        dictionaries
-
-        Bonus: What should happen if the file isn't there?
-                What should happen if the file has invalid JSON in it?
-        """
-        return []
+        try:
+            with open(self.file, "r") as f:
+                self.contacts = json.load(f)
+        except (FileNotFoundError, json.JSONDecodeError):
+            self.contacts = []
+            print(f"File {self.file} does not exist or JSON data corrupt.")
+        return self.contacts
 
     def add_contact(self, contact):
-        """Adds a contact to the list, and saves the file"""
-        pass
+        self.contacts.append(contact)
+        with open(self.file, "w") as f:
+            json.dump(self.contacts, f, indent=4)
 
     def update_contact(self, contact_to_update):
-        """
-        Updates a contact an saves the file
-
-        Bonus: What happens when the id doesn't exist?
-        """
-        pass
+        for i, contact in enumerate(self.contacts):
+            if contact["id"] == contact_to_update["id"]:
+                self.contacts[i] = contact_to_update
+                with open(self.file, "w") as f:
+                    json.dump(self.contacts, f, indent=4)
+                return
+        print(f"No contact found with ID {contact_to_update['id']}.")
 
     def delete_contact(self, id_to_delete):
-        """
-        Deletes a contact and saves the file
-
-        Bonus: What happens when the id doesn't exist?
-        """
-        pass
+        for i, contact in enumerate(self.contacts):
+            if contact["id"] == id_to_delete:
+                del self.contacts[i]
+                with open(self.file, "w") as f:
+                    json.dump(self.contacts, f, indent=4)
+                return
+        print(f"No contact found with ID {id_to_delete}.")
